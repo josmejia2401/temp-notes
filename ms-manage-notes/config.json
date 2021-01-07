@@ -1,0 +1,18 @@
+{
+	"environment" : "dev",
+	"general" : {
+		"appName" : ""
+	},
+	"server" : {
+		"port" : 8080,
+		"readTimeout":  15,
+		"writeTimeout": 15,
+		"idleTimeout":  120
+	},
+	"db" : {
+		"uri" : "",
+		"maxPoolSize" : 3,
+        "timeOut": 15,
+        "name" : ""
+	}
+}
