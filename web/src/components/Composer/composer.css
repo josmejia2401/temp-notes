@@ -1,0 +1,44 @@
+.composer-container {
+  max-width: 600px;
+  margin: 0 auto 32px;
+}
+
+.composer-container.edit {
+  margin: 0;
+  max-width: 700px;
+  width: 100%;
+}
+
+@media screen and (max-width: 600px) {
+  .composer-container.edit {
+    margin: 0px;
+    padding: 10px;
+    max-width: calc(100% - 20px);
+    width: 100%;
+  }
+}
+
+
+@media screen and (max-width: 300px) {
+  .composer-container.edit {
+    margin: 0px;
+    padding: 10px;
+    max-width: calc(100% - 20px);
+    width: 100%;
+  }
+}
+
+
+.composer-container.edit .note-content {
+  min-height: 150px;
+}
+
+.input-form {
+  font-family: 'Roboto Slab', serif;
+}
+
+.actions {
+  position: relative;
+  font-size: 12px;
+  text-align: right;
+}

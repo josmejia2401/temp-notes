@@ -1,0 +1,19 @@
+.note {
+
+}
+
+.note-title {
+  font-size: 17px;
+  font-weight: bold;
+  line-height: 23px;
+  min-height: 38px;
+  word-wrap: break-word;
+  word-break: break-all;
+}
+
+.note-content {
+  font-family: 'Roboto Slab', serif;
+  word-wrap: break-word;
+  word-break: break-all;
+  text-align: justify;
+}
