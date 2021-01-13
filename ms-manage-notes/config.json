@@ -10,9 +10,9 @@
 		"idleTimeout":  120
 	},
 	"db" : {
-		"uri" : "mongodb+srv://sudo9:sudo9@su9-cluster.zfzcn.mongodb.net/sudo9_dev?retryWrites=true&w=majority",
+		"uri" : "mongodb+srv://username:password@su9-cluster.zfzcn.mongodb.net/sudo9_dev?retryWrites=true&w=majority",
 		"maxPoolSize" : 3,
         "timeOut": 15,
-        "name" : "sudo9"
+        "name" : "sudo9_dev"
 	}
 }

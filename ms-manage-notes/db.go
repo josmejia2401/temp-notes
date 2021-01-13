@@ -79,7 +79,7 @@ func DbClose() {
 	Log.Println("Connection to MongoDB closed.")
 }
 
-func DbInsert(body *ManageNoteStruct) (error, *ManageNoteStruct) {
+func DbInsert(body *TempNoteStruct) (error, *TempNoteStruct) {
 	insertResult, err := DbCollection(DB_COL).InsertOne(context.TODO(), body)
 	if err != nil {
 		return err, nil
@@ -92,13 +92,13 @@ func DbInsert(body *ManageNoteStruct) (error, *ManageNoteStruct) {
 	return nil, body
 }
 
-func DbGetByID(id string) (error, *ManageNoteStruct) {
+func DbGetByID(id string) (error, *TempNoteStruct) {
 	_id, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return err, nil
 	}
 	filter := bson.D{{"_id", _id}}
-	var result = ManageNoteStruct{}
+	var result = TempNoteStruct{}
 	err = DbCollection(DB_COL).FindOne(context.TODO(), filter).Decode(&result)
 	if err != nil {
 		return err, nil
@@ -106,7 +106,17 @@ func DbGetByID(id string) (error, *ManageNoteStruct) {
 	return nil, &result
 }
 
-func DbUpdate(id string, body ManageNoteStruct) error {
+func DbGetByOwner(owner string) (error, *TempNoteStruct) {
+	filter := bson.D{{"ownerUsername", owner}}
+	var result = TempNoteStruct{}
+	err := DbCollection(DB_COL).FindOne(context.TODO(), filter).Decode(&result)
+	if err != nil {
+		return err, nil
+	}
+	return nil, &result
+}
+
+func DbUpdate(id string, body TempNoteStruct) error {
 	_id, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return err
