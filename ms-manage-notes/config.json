@@ -1,18 +1,18 @@
 {
-	"environment" : "dev",
-	"general" : {
-		"appName" : ""
+	"environment": "dev",
+	"general": {
+		"appName": ""
 	},
-	"server" : {
-		"port" : "8080",
-		"readTimeout":  15,
+	"server": {
+		"port": "8080",
+		"readTimeout": 15,
 		"writeTimeout": 15,
-		"idleTimeout":  120
+		"idleTimeout": 120
 	},
-	"db" : {
-		"uri" : "mongodb+srv://username:password@su9-cluster.zfzcn.mongodb.net/sudo9_dev?retryWrites=true&w=majority",
-		"maxPoolSize" : 3,
-        "timeOut": 15,
-        "name" : "sudo9_dev"
+	"db": {
+		"uri": "mongodb+srv://username:password@su9-cluster.zfzcn.mongodb.net/sudo9_dev?retryWrites=true&w=majority",
+		"maxPoolSize": 3,
+		"timeOut": 15,
+		"name": "sudo9_dev"
 	}
 }
