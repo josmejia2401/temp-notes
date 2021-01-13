@@ -13,7 +13,15 @@ func loadJson() (error, map[string]interface{}) {
 	}
 	defer jsonFile.Close()
 	byteValue, _ := ioutil.ReadAll(jsonFile)
-	var result map[string]interface{}
+	/*var result map[string]interface{}
 	json.Unmarshal([]byte(byteValue), &result)
-	return nil, result
+	return nil, result*/
+	var f interface{}
+	err = json.Unmarshal([]byte(byteValue), &f)
+	if err != nil {
+		return err, nil
+	}
+	m := f.(map[string]interface{})
+	//fmt.Println("Type = %v", m)
+	return nil, m
 }

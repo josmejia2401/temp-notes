@@ -4,15 +4,15 @@
 		"appName" : ""
 	},
 	"server" : {
-		"port" : 8080,
+		"port" : "8080",
 		"readTimeout":  15,
 		"writeTimeout": 15,
 		"idleTimeout":  120
 	},
 	"db" : {
-		"uri" : "",
+		"uri" : "mongodb+srv://sudo9:sudo9@su9-cluster.zfzcn.mongodb.net/sudo9_dev?retryWrites=true&w=majority",
 		"maxPoolSize" : 3,
         "timeOut": 15,
-        "name" : ""
+        "name" : "sudo9"
 	}
 }

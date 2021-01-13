@@ -16,7 +16,7 @@ func SetupCloseHandler() {
 	go func() {
 		<-c
 		Log.Println("\r- Ctrl+C pressed in Terminal")
-		DbClose()
+		//DbClose()
 		os.Exit(0)
 	}()
 }
@@ -36,9 +36,9 @@ func main() {
 
 	Log.Println(CONFIG_JSON)
 	server := CONFIG_JSON["server"].(map[string]interface{})
-	readTimeout := server["readTimeout"].(int)
-	writeTimeout := server["writeTimeout"].(int)
-	idleTimeout := server["idleTimeout"].(int)
+	readTimeout := int(server["readTimeout"].(float64))
+	writeTimeout := int(server["writeTimeout"].(float64))
+	idleTimeout := int(server["idleTimeout"].(float64))
 	port := server["port"].(string)
 
 	srv := &http.Server{
@@ -48,5 +48,7 @@ func main() {
 		Handler:      s,
 		Addr:         ":" + port,
 	}
+
+	Log.Println("INICIANDO")
 	Log.Fatal(srv.ListenAndServe())
 }

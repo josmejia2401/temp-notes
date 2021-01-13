@@ -20,19 +20,27 @@ var dbDb *mongo.Database = Dbdb()
 
 func DbClient() *mongo.Client {
 	error1, CONFIG_JSON := loadJson()
+
 	if error1 != nil {
+		Log.Fatal(error1)
 		panic(error1)
 	}
+
 	db := CONFIG_JSON["db"].(map[string]interface{})
 	uri := db["uri"].(string)
-	maxPoolSize := db["maxPoolSize"].(uint64)
-	appName := db["appName"].(string)
-	timeOut := db["timeOut"].(int)
+	maxPoolSize := int(db["maxPoolSize"].(float64))
+	timeOut := int(db["timeOut"].(float64))
+
+	general := CONFIG_JSON["general"].(map[string]interface{})
+	appName := general["appName"].(string)
 
 	clientOptions := options.Client().ApplyURI(uri)
-	clientOptions.SetMaxPoolSize(maxPoolSize)
+	clientOptions.SetMaxPoolSize(uint64(maxPoolSize))
 	clientOptions.SetAppName(appName)
 	clientOptions.SetConnectTimeout(time.Duration(timeOut) * time.Second)
+
+	Log.Println("Aqui vamos!")
+
 	client, err := mongo.Connect(context.TODO(), clientOptions)
 	if err != nil {
 		Log.Fatal(err)
