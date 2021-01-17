@@ -8,3 +8,6 @@ in react js
 3. go get -v ./...    or    3. go get -d -v ./...
 4. go build *go
 5. go run *go
+
+### Python
+pip3 install -r requirements.txt
