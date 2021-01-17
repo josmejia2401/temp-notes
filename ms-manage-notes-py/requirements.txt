@@ -1,6 +1,10 @@
 Flask==1.1.2
+#Inyeccion de dependencias
 #Flask-Injector==0.12.3
 #injector==0.18.3
+# Base de datos
 pymongo==3.11.2
+# DNS
 dnspython==2.1.0
-requests==2.25.1
+# Consumo a REST APIs externas
+#requests==2.25.1
