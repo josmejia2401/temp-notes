@@ -1,0 +1,6 @@
+# Base de datos
+pymongo==3.11.2
+# DNS
+dnspython==2.1.0
+# Consumo a REST APIs externas
+#requests==2.25.1

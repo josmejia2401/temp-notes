@@ -1,0 +1,26 @@
+{
+	"environment": "dev",
+	"general": {
+		"appName": "ms-manage-notes"
+	},
+	"server": {
+		"host" : "0.0.0.0",
+		"port": 8081,
+		"debug" : true
+	},
+	"db": {
+		"uri": "mongodb+srv://<user>:<password>@su9-cluster.zfzcn.mongodb.net/sudo9_dev?retryWrites=true&w=majority",
+		"uri2": "mongodb://<user>:<password>@su9-cluster-shard-00-00.zfzcn.mongodb.net:27017,su9-cluster-shard-00-01.zfzcn.mongodb.net:27017,su9-cluster-shard-00-02.zfzcn.mongodb.net:27017/sudo9_dev?ssl=true&replicaSet=atlas-113f46-shard-0&authSource=admin&retryWrites=true&w=majority",
+		"name": "sudo9_dev",
+		"maxPoolSize": 1,
+		"minPoolSize" : 0,
+		"maxIdleTimeMS" : 20000,
+		"socketTimeoutMS" : 20000,
+		"connectTimeoutMS" : 20000,
+		"serverSelectionTimeoutMS": 20000
+	},
+	"timer": {
+		"WAIT_TIME_SECONDS" : 1800,
+		"days_of_grace": 5
+	}
+}
