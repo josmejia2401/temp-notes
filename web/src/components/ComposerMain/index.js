@@ -88,7 +88,7 @@ class ComposerMain extends Component {
   render() {
     const { isEdit } = this.props;
     return (
-      <div className={`card composer-container ${isEdit ? 'edit' : ''}`}>
+      <div className={`card-main composer-container ${isEdit ? 'edit' : ''}`}>
         <form onSubmit={this.handleSubmit} className="input-form">
           <Input
             type="text"
@@ -109,7 +109,7 @@ class ComposerMain extends Component {
           />
           <div className="actions">
             {isEdit && <Button onClick={this.handleDelete}>Delete</Button>}
-            <Button>Done</Button>
+            <Button>Done</Button> 
           </div>
         </form>
       </div>

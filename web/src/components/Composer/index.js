@@ -96,6 +96,13 @@ class Composer extends Component {
     }
   };
 
+  handleCancel = e => {
+    if (e && e.target) {
+      e.preventDefault();
+      this.props.history.goBack();
+    }
+  };
+
   getValue = fieldName => {
     let val = this.state[fieldName].value;
     val = val.replace(/<\s*\/?br\s*[\/]?>/g, '\n');
@@ -115,6 +122,7 @@ class Composer extends Component {
             autoFocus
             value={this.getValue('title')}
             onChange={this.handleChange}
+            style={{ 'marginBottom': '5px' }}
           />
           <Textarea
             id="textAreaComposerEdit"
@@ -126,11 +134,12 @@ class Composer extends Component {
             value={this.getValue('description')}
             onChange={this.handleChange}
             onInput={this.handleResize}
-            style={{}}
+            style={{ 'marginTop': '5px' }}
           />
           <div className="actions">
+            <Button>Actualizar</Button>
             {isEdit && <Button onClick={this.handleDelete}>Delete</Button>}
-            <Button>Done</Button>
+            <Button onClick={this.handleCancel}>Cancel</Button>
           </div>
         </form>
       </div>

@@ -52,7 +52,7 @@ class NoteDetail extends Component {
       <div className={`box-fill modal ${modalClass}`} ref={node => (this._modal = node)}>
         <div className="box-fill modal-backdrop" ref={node => (this._modalBackdrop = node)}/>
         <div className="modal-content center-item" ref={node => (this._modalContent = node)}>
-          <Composer note={note} isEdit onSubmit={this._onUpdateItem} onDelete={this._onDeleteItem}/>
+          <Composer note={note} isEdit onSubmit={this._onUpdateItem} onDelete={this._onDeleteItem} history={this.props.history} />
         </div>
       </div>
     );
@@ -71,7 +71,7 @@ class NodeDetailTransition extends Component {
             foundNote = notes.find(note => note.id == match.params.noteId);
           }
           if (match && foundNote) {
-            return (<NoteDetail onUpdate={onUpdate} onDelete={onDelete} note={foundNote}/>);
+            return (<NoteDetail onUpdate={onUpdate} onDelete={onDelete} note={foundNote} history={this.props.history} />);
           } else {
             return null;
           }

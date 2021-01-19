@@ -41,11 +41,17 @@ class NoteService(object):
                 del document['_id']
         return documents
 
-    def update(self, username=None, noteId=None, payload = None) -> int:
+    def update(self, username=None, noteId=None, payload = None) -> str:
         updated_payload = { "$set": payload }
         where_payload = { "username": username, "_id": ObjectId(noteId) }
         response = self.__collection.update_one(where_payload, updated_payload, upsert=False)
-        return response.modified_count
+        if response and response.modified_count > 0:
+            document = self.__collection.find_one({"username": username, "_id": ObjectId(noteId) })
+            if document:
+                document['id'] = str(document['_id'])
+                del document['_id']
+                return document
+        return None
 
     def delete(self, username=None, noteId=None) -> int:
         where_payload = { "username": username, "_id": ObjectId(noteId)}

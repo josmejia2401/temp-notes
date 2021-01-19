@@ -51,8 +51,8 @@ def update(username, noteId):
         if request.is_json:
             payload = request.get_json()
             result = note.update(username=username, noteId=noteId, payload=payload)
-            if result > 0:
-                return Response(result, status=200, mimetype='application/json')
+            if result:
+                return Response(json.dumps(result), status=200, mimetype='application/json')
             return Response(json.dumps({}),status=204, mimetype='application/json')
         return {}, 500
     except Exception as e:
@@ -63,9 +63,18 @@ def update(username, noteId):
 def delete(username, noteId):
     try:
         result = note.delete(username=username, noteId=noteId)
-        if result > 0:
-            return Response(result, status=200, mimetype='application/json')
+        if result and result > 0:
+            return Response(json.dumps({'result' : result}), status=200, mimetype='application/json')
         return Response(json.dumps({}),status=204, mimetype='application/json')
     except Exception as e:
         print(e)
         return {}, 500
+
+@app.after_request
+def after_request(response):
+    response.headers.add(['Access-Control-Allow-Origin'], '*')
+    response.headers.add("Access-Control-Allow-Origin", "*")
+    response.headers.add('Access-Control-Allow-Headers', "*")
+    response.headers.add('Access-Control-Allow-Methods', "*")
+    return response
+

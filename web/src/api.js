@@ -1,49 +1,44 @@
-import uuidv4 from 'uuid/v4';
-const BASE_URL = 'https://google-keep.herokuapp.com/api';
-
-// Please use yours TOKEN HERE
-const TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NDIsImlhdCI6MTUwMDEwOTIxNCwiZXhwIjoxNTAwMTEyODE0fQ.EkE7nqENZknZyk1V2YkYMqUTkUNycEE5qJCKdpP97p8'
+const BASE_URL = 'http://localhost:8080/ms/temp-notes';
 
 const fetchJSON = (url, option) => {
   return fetch(`${BASE_URL}${url}`, {
     ...option,
     headers: {
       'content-type': 'application/json',
-      'Authorization': `Bearer ${TOKEN}`,
     } 
-  })
-  .then(response => {
+  }).then(response => {
     if(response && !response.ok) {
-      return new Error('error');
+      //return new Error('error');
+      throw Error(response.statusText);
     }
     return response.json();
   });
 }
 
-export const getNotes = () => {
-  return fetchJSON('/notes');
+export const getNotes = (username) => {
+  return fetchJSON(`/${username}/get-all`);
 }
 
-export const getNote = noteId => {
-  return fetchJSON(`/notes/${noteId}`);
+export const getNote = (username, noteId) => {
+  return fetchJSON(`/${username}/${noteId}/get`);
 }
 
-export const addNote = note => {
-  return fetchJSON('/notes', {
+export const addNote = (username, note) => {
+  return fetchJSON(`/${username}/create`, {
     method: 'POST',
     body: JSON.stringify(note),
   });
 }
 
-export const updateNote = note => {
-  return fetchJSON(`/notes/${note.id}`, {
+export const updateNote = (username, note) => {
+  return fetchJSON(`/${username}/${note.id}/update`, {
     method: 'PUT',
     body: JSON.stringify(note),
   });
 }
 
-export const deleteNote = note => {
-  return fetchJSON(`/notes/${note.id}`, {
+export const deleteNote = (username, note) => {
+  return fetchJSON(`/${username}/${note.id}/delete`, {
     method: 'DELETE',
   });
 }
