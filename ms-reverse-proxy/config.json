@@ -1,0 +1,20 @@
+{
+    "environment": "dev",
+	"general": {
+		"appName": ""
+	},
+	"server": {
+		"port": "8080",
+		"readTimeout": 15,
+		"writeTimeout": 15,
+		"idleTimeout": 120
+    },
+    "targetAllow" : [
+        {
+            "name" : "manage-notes",
+            "host" : "localhost",
+            "port" : "9090",
+            "scheme" : "http"
+        }
+    ]
+}

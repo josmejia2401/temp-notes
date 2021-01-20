@@ -1,0 +1,26 @@
+{
+	"environment": "dev",
+	"general": {
+		"appName": "ms-reverse-proxy"
+	},
+	"server": {
+		"host" : "0.0.0.0",
+		"port": 9090,
+		"debug" : true
+	},
+    "db": { },
+    "targetHost" : [
+        {
+            "id" : "ms-manage-notes-service",
+            "path" : "/ms/temp-notes/",
+            "url" : "http://localhost:8080",
+            "methods" : []
+        },
+        {
+            "id" : "web-temp-notes-service",
+            "path" : "",
+            "url" : "http://localhost:8081",
+            "methods" : []
+        }
+    ]
+}

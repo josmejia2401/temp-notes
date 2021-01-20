@@ -106,6 +106,7 @@ class ComposerMain extends Component {
             value={this.getValue('description')}
             onChange={this.handleChange}
             onInput={this.handleResize}
+            style={{marginTop: '10px'}}
           />
           <div className="actions">
             {isEdit && <Button onClick={this.handleDelete}>Delete</Button>}
