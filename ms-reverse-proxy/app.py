@@ -1,24 +1,14 @@
-from main.main import ProxyHandler, ThreadingHTTPServer
-from main.util.config import Config
+#!/usr/bin/python3
+import sys
+from main.main import ProxyServer
 
 if __name__ == '__main__':
-    httpd = None
     try:
-        __config = Config()
-        __configServer = __config.get_object('server')
-        host = __configServer['host']
-        port = int(__configServer['port'])
-        httpd = ThreadingHTTPServer((host, port), ProxyHandler)
-        httpd.serve_forever()
-        httpd.shutdown()
-    except KeyboardInterrupt:
-        if httpd:
-            httpd.shutdown()
-            httpd.server_close()
-            httpd.socket.close()
+        server = ProxyServer()
+        server.run()
+    except KeyboardInterrupt as e:
+        print ("Ctrl C - Stopping server", e)
+        sys.exit(1)
     except Exception as e:
-        print(e)
-        if httpd:
-            httpd.shutdown()
-            httpd.server_close()
-            httpd.socket.close()
+        print ("Stopping server", e)
+        sys.exit(1)

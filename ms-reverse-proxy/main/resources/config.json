@@ -5,21 +5,25 @@
 	},
 	"server": {
 		"host" : "0.0.0.0",
-		"port": 9090,
-		"debug" : true
+		"port": 8080,
+        "debug" : true,
+        "listen" : 5,
+        "maxDataRecvInMB" : 1024,
+        "timeOutInSec": 20
+
 	},
     "db": { },
     "targetHost" : [
         {
-            "id" : "ms-manage-notes-service",
+            "id" : "ms-temp-notes-service",
             "path" : "/ms/temp-notes/",
-            "url" : "http://localhost:8080",
+            "url" : "http://localhost:9000",
             "methods" : []
         },
         {
             "id" : "web-temp-notes-service",
-            "path" : "",
-            "url" : "http://localhost:8081",
+            "path" : "/notes",
+            "url" : "http://localhost:9005",
             "methods" : []
         }
     ]

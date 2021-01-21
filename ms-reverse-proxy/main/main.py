@@ -1,176 +1,123 @@
-#!/usr/bin/env python3.8
-
-
-#import BaseHTTPServer
-from http.server import BaseHTTPRequestHandler, HTTPServer
-import socketserver
-#import urlparse
-#import urllib.parse as urlparse
-import requests
+#!/usr/bin/python3
+import os
+import sys
+import threading
+import socket
+import ssl
+from urllib.parse import urlparse
 from main.util.config import Config
-import datetime
-import json
 
-def merge_two_dicts(x, y):
-    z = x.copy()   # start with x's keys and values
-    z.update(y)    # modifies z with y's keys and values & returns None
-    return z
+class MyThread(threading.Thread):
+    def __init__(self, config, conn, client_addr, request, backend_found):
+        threading.Thread.__init__(self)
+        self.__configServer = config.get_object('server')
+        self.conn = conn
+        self.client_addr = client_addr
+        self.request = request
+        self.backend_found = backend_found
 
-def set_header():
-    headers = {
-        'Host': 'www.google.com'
-    }
-    return headers
+    def re_init(self, config, conn, client_addr, request, backend_found):
+        self.__configServer = config.get_object('server')
+        self.conn = conn
+        self.client_addr = client_addr
+        self.request = request
+        self.backend_found = backend_found
 
-class ProxyHandler (BaseHTTPRequestHandler):
-    #__base = BaseHTTPRequestHandler
-    #__base_handle = __base.handle
-    rbufsize = 0                        # self.rfile Be unbuffered
-    allowed_clients = []
-    __config = Config()
+    def resolve(self, s):
+        try:
+            url_parse = urlparse(self.backend_found['url'])
+            #ParseResult(scheme='http', netloc='www.cwi.nl:80', path='/%7Eguido/Python.html', params='', query='', fragment='')
+            timeOutInSec = int(self.__configServer['timeOutInSec'])
+            maxDataRecvInMB = int(self.__configServer['maxDataRecvInMB'])
+            s.settimeout(timeOutInSec)
+            s.connect((url_parse.hostname, url_parse.port))
+            print("SOCKET established. Peer: {}".format(s.getpeername()))
+            s.send(self.request)
+            while True:
+                data = s.recv(maxDataRecvInMB)
+                if len(data) > 0:
+                    self.conn.send(data)
+                else:
+                    break
+        except socket.error as e:
+            print('resolve.socket.error', e)
+        except Exception as e:
+            print('resolve.Exception', e)
+        finally:
+            #if s: s.shutdown(socket.SHUT_RDWR)
+            if s: s.close()
+            if self.conn: self.conn.close()
 
+    def run(self):
+        try:
+            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self.resolve(s)
+        except socket.error as e:
+            print('http.socket.error', e)
+        except Exception as e:
+            print('http.Exception', e)
+        finally:
+            client_addr = None
 
-    def __allows_path(self, path):
+class ProxyServer(object):
+
+    def __init__(self):
+        try:
+            self.__config = Config()
+            self.__configServer = self.__config.get_object('server')
+            host = self.__configServer['host']
+            port = int(self.__configServer['port'])
+            listen = int(self.__configServer['listen'])
+
+            self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self.server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            self.server.bind((host, port))
+            self.server.listen(listen)
+            print("listening [*] on {}:{}".format(host, port))
+        except socket.error as e:
+            print('__init__', e)
+            if self.server: self.server.close()
+            sys.exit(1)
+        except Exception as e:
+            print('__init__', e)
+            if self.server: self.server.close()
+            sys.exit(1)
+
+    def run(self):
+        try:
+            print("starting listening")
+            while True:
+                conn, client_addr = self.server.accept()
+                print('receiving ==> ip: {}, port : {}'.format(client_addr[0], client_addr[1]))
+                maxDataRecvInMB = int(self.__configServer['maxDataRecvInMB'])
+                request = conn.recv(maxDataRecvInMB)
+                backend_found = self.__allows_path(request)
+                if not backend_found:
+                    conn.close()
+                else:
+                    threadx = MyThread(self.__config, conn, client_addr, request, backend_found)
+                    threadx.daemon = False
+                    threadx.start()
+        except Exception as e:
+            print('run', e)
+            if self.server: self.server.close()
+            sys.exit(1)
+
+    def __allows_path(self, request):
+        if not request:
+            return None
+        first_line = str(request).split('\n')[0]
+        url = first_line.split(' ')[1]
         targetHost = self.__config.get_object('targetHost')
         for target in targetHost:
-            if path in target['path']:
-                return target
-            elif target['path'] in path:
-                return target
-            else:
-                return None
-
-    def __response_error(self, code = 500, body = {}):
-        self.send_response_only(code)
-        x = datetime.datetime.now()
-        self.send_header('Date',x.strftime("%c"))
-        self.send_header('Content-type','application/json')
-        self.send_header('Content-Length',len(json.dumps(body).encode()))
-        self.end_headers()
-        self.wfile.write(json.dumps(body).encode())
-
-    def do_GET(self, body=True):
-        try:
-            targetHost = self.__allows_path(self.path)
-            if not targetHost:
-                body = {"message" : "path not allowed or found"}
-                self.__response_error(404, body)
-                return
-            url = '{}{}'.format(targetHost['url'], self.path)
-            req_header = self.parse_headers()
-            resp = requests.get(url, headers=merge_two_dicts(req_header, set_header()), verify=False)
-            self.send_response(resp.status_code)
-            self.send_resp_headers(resp)
-            if body:
-                self.wfile.write(resp.content)
-        except Exception as e:
-            self.log_error("Request got ab error out: %r", e)
-            body = { "message" : str(e) }
-            self.__response_error(500, body)
-        finally:
-            self.close_connection = 1
-    
-    def do_POST(self, body=True):
-        try:
-            targetHost = self.__allows_path(self.path)
-            if not targetHost:
-                body = {"message" : "path not allowed or found"}
-                self.__response_error(404, body)
-                return
-            url = '{}{}'.format(targetHost['url'], self.path)
-            content_len = int(self.headers['content-length'])
-            post_body = self.rfile.read(content_len)
-            req_header = self.parse_headers()
-            resp = requests.post(url, data=post_body, headers=merge_two_dicts(req_header, set_header()), verify=False)
-            self.send_response(resp.status_code)
-            self.send_resp_headers(resp)
-            if body:
-                self.wfile.write(resp.content)
-                print('resp.content', resp.content)
-        except Exception as e:
-            self.log_error("Request got ab error out: %r", e)
-            body = { "message" : str(e) }
-            self.__response_error(500, body)
-        finally:
-            self.close_connection = 1
-
-    def do_PUT(self, body=True):
-        try:
-            targetHost = self.__allows_path(self.path)
-            if not targetHost:
-                body = {"message" : "path not allowed or found"}
-                self.__response_error(404, body)
-                return
-            url = '{}{}'.format(targetHost['url'], self.path)
-            content_len = int(self.headers['content-length'])
-            post_body = self.rfile.read(content_len)
-            req_header = self.parse_headers()
-            resp = requests.put(url, data=post_body, headers=merge_two_dicts(req_header, set_header()), verify=False)
-            self.send_response(resp.status_code)
-            self.send_resp_headers(resp)
-            if body:
-                self.wfile.write(resp.content)
-        except Exception as e:
-            self.log_error("Request got ab error out: %r", e)
-            body = { "message" : str(e) }
-            self.__response_error(500, body)
-        finally:
-            self.close_connection = 1
-
-    def do_DELETE(self, body=True):
-        try:
-            targetHost = self.__allows_path(self.path)
-            if not targetHost:
-                body = {"message" : "path not allowed or found"}
-                self.__response_error(404, body)
-                return
-            url = '{}{}'.format(targetHost['url'], self.path)
-            req_header = self.parse_headers()
-            resp = requests.delete(url, headers=merge_two_dicts(req_header, set_header()), verify=False)
-            self.send_response(resp.status_code)
-            self.send_resp_headers(resp)
-            if body:
-                self.wfile.write(resp.content)
-        except Exception as e:
-            self.log_error("Request got ab error out: %r", e)
-            body = { "message" : str(e) }
-            self.__response_error(500, body)
-        finally:
-            self.close_connection = 1
-
-    def parse_headers(self):
-        req_header = {}
-        for line in self.headers:
-            line_parts = [o.strip() for o in line.split(':', 1)]
-            if len(line_parts) == 2:
-                req_header[line_parts[0]] = line_parts[1]
-        return req_header
-
-    def send_resp_headers(self, resp):
-        respheaders = resp.headers
-        for key in respheaders:
-            if key not in ['Content-Encoding', 'Transfer-Encoding', 'content-encoding', 'transfer-encoding', 'content-length', 'Content-Length']:
-                self.send_header(key, respheaders[key])
-        self.send_header('Content-Length', len(resp.content))
-        self.end_headers()
-
-class ThreadingHTTPServer (socketserver.ThreadingMixIn, HTTPServer):
-    pass
-
-
-if __name__ == '__main__':
-    httpd = None
-    try:
-        __config = Config()
-        __configServer = __config.get_object('server')
-        host = __configServer['host']
-        port = int(__configServer['port'])
-        httpd = ThreadingHTTPServer((host, port), ProxyHandler)
-        httpd.serve_forever()
-        httpd.shutdown()
-    except Exception as e:
-        print(e)
-        if httpd:
-            httpd.shutdown()
-            httpd.server_close()
-            httpd.socket.close()
+            if url in target['path']:
+                if len(target['methods']) > 0 and self.command in target['methods']:
+                    return target
+                elif len(target['methods']) == 0:
+                    return target
+            elif target['path'] in url:
+                if len(target['methods']) > 0 and self.command in target['methods']:
+                    return target
+                elif len(target['methods']) == 0:
+                    return target
+        return None
