@@ -7,5 +7,5 @@ RUN npm install
 COPY . .
 RUN npm run build build_prod
 # RUN ls -lsa
-EXPOSE 9010
+EXPOSE 9005
 CMD ["npm", "run", "start_express"]

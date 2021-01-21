@@ -13,13 +13,17 @@
     "uuid": "3.1.0"
   },
   "devDependencies": {
-    "react-scripts": "^4.0.1"
+    "react-scripts": "^4.0.1",
+    "express": "4.17.1"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "build_dev": "NODE_ENV=development PUBLIC_URL=http://localhost:9001 react-scripts build",
+    "build_prod": "NODE_ENV=production PUBLIC_URL=https://app.su9.co react-scripts build"
+
   },
   "browserslist": {
     "production": [

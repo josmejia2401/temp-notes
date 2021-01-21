@@ -6,6 +6,7 @@ import socket
 import ssl
 from urllib.parse import urlparse
 from main.util.config import Config
+from main.log.log import logger
 
 class MyThread(threading.Thread):
     def __init__(self, config, conn, client_addr, request, backend_found):
@@ -32,6 +33,7 @@ class MyThread(threading.Thread):
             s.settimeout(timeOutInSec)
             s.connect((url_parse.hostname, url_parse.port))
             print("SOCKET established. Peer: {}".format(s.getpeername()))
+            logger.info("SOCKET established. Peer: {}".format(s.getpeername()))
             s.send(self.request)
             while True:
                 data = s.recv(maxDataRecvInMB)
@@ -41,8 +43,10 @@ class MyThread(threading.Thread):
                     break
         except socket.error as e:
             print('resolve.socket.error', e)
+            logger.error(e)
         except Exception as e:
             print('resolve.Exception', e)
+            logger.error(e)
         finally:
             #if s: s.shutdown(socket.SHUT_RDWR)
             if s: s.close()
@@ -54,8 +58,10 @@ class MyThread(threading.Thread):
             self.resolve(s)
         except socket.error as e:
             print('http.socket.error', e)
+            logger.error(e)
         except Exception as e:
             print('http.Exception', e)
+            logger.error(e)
         finally:
             client_addr = None
 
@@ -76,10 +82,12 @@ class ProxyServer(object):
             print("listening [*] on {}:{}".format(host, port))
         except socket.error as e:
             print('__init__', e)
+            logger.error(e)
             if self.server: self.server.close()
             sys.exit(1)
         except Exception as e:
             print('__init__', e)
+            logger.error(e)
             if self.server: self.server.close()
             sys.exit(1)
 
@@ -100,6 +108,7 @@ class ProxyServer(object):
                     threadx.start()
         except Exception as e:
             print('run', e)
+            logger.error(e)
             if self.server: self.server.close()
             sys.exit(1)
 

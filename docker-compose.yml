@@ -1,0 +1,69 @@
+version: '3.4'
+services:
+  ms-reverse-proxy:
+    container_name: ms-reverse-proxy
+    build:
+      context: ms-reverse-proxy
+      dockerfile: Dockerfile
+    environment:
+      - ENVIRONMENT=production
+    ports:
+      - "8080:8080"
+    networks:
+      - fullstack
+    volumes:
+      - ./logs/:/logs:rw
+    restart: always
+    depends_on:
+      - "ms-manage-notes"
+      - "web"
+  ms-manage-notes:
+    container_name: ms-manage-notes
+    build:
+      context: ms-manage-notes
+      dockerfile: Dockerfile
+    environment:
+      - ENVIRONMENT=production
+    ports:
+      - "9000:9000"
+    networks:
+      - fullstack
+    volumes:
+      - ./logs/:/logs:rw
+    restart: always
+  web:
+    container_name: web
+    build:
+      context: web
+      dockerfile: Dockerfile
+    environment:
+      - ENVIRONMENT=production
+    ports:
+      - "9005:9005"
+    networks:
+      - fullstack
+    volumes:
+      - ./logs/:/logs:rw
+      - ./app:/app
+      - ./app/node_modules
+      - ./build:/build
+    restart: always
+    stdin_open: true
+  ms-timer-task:
+    container_name: ms-timer-task
+    build:
+      context: ms-timer-task
+      dockerfile: Dockerfile
+    environment:
+      - ENVIRONMENT=production
+    ports:
+      - "9010:9010"
+    networks:
+      - fullstack
+    volumes:
+      - ./logs/:/logs:rw
+    restart: always
+    stdin_open: true
+networks:
+  fullstack:
+    driver: bridge

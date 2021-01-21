@@ -1,6 +1,7 @@
 from flask import Flask, request, Response
 from main.controllers.note_controller import NoteController
 from main.util.config import Config
+from main.log.log import logger
 import json
 
 app = Flask(__name__)
@@ -23,6 +24,7 @@ def insert(username):
         return {}, 500
     except Exception as e:
         print(e)
+        logger.error('insert', e)
         return {}, 500
 
 @app.route('/ms/temp-notes/<username>/<noteId>/get', methods=['GET'])
@@ -32,6 +34,7 @@ def get(username, noteId):
         return (result, 200) if result else ({}, 204)
     except Exception as e:
         print(e)
+        logger.error('get', e)
         return {}, 500
 
 @app.route('/ms/temp-notes/<username>/get-all', methods=['GET'])
@@ -43,6 +46,7 @@ def get_all(username):
         return Response(json.dumps({}),status=204, mimetype='application/json')
     except Exception as e:
         print(e)
+        logger.error('get_all', e)
         return {}, 500
 
 @app.route('/ms/temp-notes/<username>/<noteId>/update', methods=['PUT'])
@@ -57,6 +61,7 @@ def update(username, noteId):
         return {}, 500
     except Exception as e:
         print(e)
+        logger.error('update', e)
         return {}, 500
 
 @app.route('/ms/temp-notes/<username>/<noteId>/delete', methods=['DELETE'])
@@ -68,6 +73,7 @@ def delete(username, noteId):
         return Response(json.dumps({}),status=204, mimetype='application/json')
     except Exception as e:
         print(e)
+        logger.error('delete', e)
         return {}, 500
 
 @app.after_request
