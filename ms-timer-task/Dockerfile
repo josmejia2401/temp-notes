@@ -1,11 +1,15 @@
-FROM node:14.1-alpine
-ENV ENVIRONMENT=production 
+FROM python:alpine3.8
+RUN mkdir /app
+RUN mkdir ${USER}/data/
+ARG LOG_DIR=/logs
+# Create Log Directory
+RUN mkdir -p ${LOG_DIR}
+# Environment Variables
+ENV LOG_FILE_LOCATION=${LOG_DIR}/
+ENV ENVIRONMENT=production
+COPY . /app
 WORKDIR /app
-COPY package*.json ./
-RUN npm install -g express
-RUN npm install
-COPY . .
-RUN npm run build build_prod
-# RUN ls -lsa
+ENV ENVIRONMENT=production
+RUN pip3 install -r requirements.txt
 EXPOSE 9010
-CMD ["npm", "run", "start_express"]
+CMD [ "python3", "./app.py" ]

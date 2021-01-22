@@ -6,6 +6,9 @@ const fs = require('fs');
 const dirname = __dirname
 const build = dirname + '/build/';
 app.use(express.static(build));
+app.use('/public', express.static('public'));
+
+
 
 function fromDir(startPath, filter) {
     if (!fs.existsSync(startPath)) {
@@ -25,6 +28,12 @@ function fromDir(startPath, filter) {
     };
 };
 fromDir('./', '.html');
+
+app.get('/service-worker.js', function (req, res) {
+    const index = path.join(__dirname, 'src', 'serviceWorker.js');
+    res.sendFile(index);
+});
+
 
 app.get('*', function (req, res) {
     const index = path.join(dirname, 'build', 'index.html');

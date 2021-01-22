@@ -11,3 +11,13 @@ in react js
 
 ### Python
 pip3 install -r requirements.txt
+
+sudo docker-compose up -d
+sudo docker-compose -f docker-compose.yml up
+
+sudo docker stop $(sudo docker container ls -q)
+sudo docker container rm $(sudo docker container ls -q)
+sudo docker image rm $(sudo docker image ls -q)
+sudo docker volume rm $(sudo docker volume ls -q --filter dangling=true)
+sudo docker system prune --all
+
