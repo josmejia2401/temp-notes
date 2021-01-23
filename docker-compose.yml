@@ -14,6 +14,14 @@ services:
     volumes:
       - ./logs/:/logs:rw
     restart: always
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 100M
+        reservations:
+          cpus: '0.1'
+          memory: 50M
     depends_on:
       - "ms-manage-notes"
       - "web"
@@ -31,6 +39,14 @@ services:
     volumes:
       - ./logs/:/logs:rw
     restart: always
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 100M
+        reservations:
+          cpus: '0.1'
+          memory: 50M
   web:
     container_name: web
     build:
@@ -49,6 +65,14 @@ services:
       - ./build:/build
     restart: always
     stdin_open: true
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 100M
+        reservations:
+          cpus: '0.1'
+          memory: 50M
   ms-timer-task:
     container_name: ms-timer-task
     build:
@@ -64,6 +88,14 @@ services:
       - ./logs/:/logs:rw
     restart: always
     stdin_open: true
+    deploy:
+      resources:
+        limits:
+          cpus: '0.3'
+          memory: 70M
+        reservations:
+          cpus: '0.05'
+          memory: 30M
 networks:
   fullstack:
     driver: bridge
