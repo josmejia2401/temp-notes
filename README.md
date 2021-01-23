@@ -35,3 +35,21 @@ sudo docker system prune --all
 sudo service docker restart
 sudo service docker start
 sudo service docker stop
+
+
+## Abrir puerto
+sudo systemctl status ufw 
+sudo ufw enable
+sudo ufw allow 8080/tcp
+# ftp
+sudo ufw allow 21
+# sftp
+sudo ufw allow 22
+# remover regla 8080
+sudo ufw deny 8080
+# reset
+sudo ufw reset
+# disable
+sudo ufw disable
+# status
+sudo ufw status
