@@ -32,16 +32,11 @@ class MyThread(threading.Thread):
             maxDataRecvInMB = int(self.__configServer['maxDataRecvInMB'])
             s.settimeout(timeOutInSec)
             s.connect((url_parse.hostname, url_parse.port))
-
             logger.info("SOCKET established. Peer: {}".format(s.getpeername()))
-            logger.info("REQUEST: {}".format(self.request))
-
-            new_host = bytes('Host: {}:{}'.format('localhost', url_parse.port), encoding='utf8')
+            new_host = bytes('Host: {}:{}'.format(url_parse.hostname, url_parse.port), encoding='utf8')
             current_host = b'Host: localhost:8080'
             self.request = self.request.replace(current_host, new_host)
-            
-            logger.info("NEW REQUEST: {}".format(self.request))
-
+            #logger.info("NEW REQUEST: {}".format(self.request))
             s.send(self.request)
             while True:
                 data = s.recv(maxDataRecvInMB)

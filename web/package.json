@@ -22,7 +22,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject",
-    "build_dev": "NODE_ENV=development PUBLIC_URL=http://localhost:9005 react-scripts build",
+    "build_dev": "NODE_ENV=development PUBLIC_URL=http://localhost:8080/notes react-scripts build",
     "build_prod": "NODE_ENV=production PUBLIC_URL=https://app.su9.co react-scripts build"
   },
   "browserslist": {
