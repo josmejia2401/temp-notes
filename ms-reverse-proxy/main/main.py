@@ -99,7 +99,8 @@ class ProxyServer(object):
             print("starting listening")
             while True:
                 conn, client_addr = self.server.accept()
-                print('receiving ==> ip: {}, port : {}'.format(client_addr[0], client_addr[1]))
+                conn.setblocking(False)
+                print('receiving connection from ==> ip: {}, port : {}'.format(client_addr[0], client_addr[1]))
                 maxDataRecvInMB = int(self.__configServer['maxDataRecvInMB'])
                 request = conn.recv(maxDataRecvInMB)
                 backend_found = self.__allows_path(request)
