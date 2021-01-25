@@ -47,18 +47,14 @@ sudo ufw allow 21
 sudo ufw allow 22
 # remover regla 8080
 sudo ufw deny 8080
+sudo ufw reject 8080
+ufw delete 8080
 # reset
 sudo ufw reset
 # disable
 sudo ufw disable
 # status
 sudo ufw status
-
-### If you want to open an incoming TCP port, type the following: (https://www.tixati.com/optimize/open-ports-linux.html)
-    iptables -I INPUT -p tcp --dport 12345 --syn -j ACCEPT
-
-### If you want to open a UDP port (perhaps for DHT in Tixati), type the following:
-    iptables -I INPUT -p udp --dport 12345 -j ACCEPT
-
-service iptables save
-https://askubuntu.com/questions/624214/open-ports-for-public
+sudo ufw status verbose
+# kill app port
+kill -9 $(lsof -t -i:8080)

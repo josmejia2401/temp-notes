@@ -64,7 +64,7 @@ services:
       - ./web/node_modules
       - ./build:/build
     restart: always
-    stdin_open: true
+    #stdin_open: true
     deploy:
       resources:
         limits:

@@ -31,12 +31,14 @@ class MyThread(threading.Thread):
             timeOutInSec = int(self.__configServer['timeOutInSec'])
             maxDataRecvInMB = int(self.__configServer['maxDataRecvInMB'])
             s.settimeout(timeOutInSec)
+            logger.info("SOCKET establisheding. Peer: {} - {}".format(url_parse.hostname, url_parse.port))
+            logger.info("REQUEST: {}".format(self.request))
             s.connect((url_parse.hostname, url_parse.port))
             logger.info("SOCKET established. Peer: {}".format(s.getpeername()))
             new_host = bytes('Host: {}:{}'.format(url_parse.hostname, url_parse.port), encoding='utf8')
             current_host = b'Host: localhost:8080'
             self.request = self.request.replace(current_host, new_host)
-            #logger.info("NEW REQUEST: {}".format(self.request))
+            logger.info("NEW REQUEST: {}".format(self.request))
             s.send(self.request)
             while True:
                 data = s.recv(maxDataRecvInMB)
@@ -45,10 +47,8 @@ class MyThread(threading.Thread):
                 else:
                     break
         except socket.error as e:
-            print('resolve.socket.error', e)
             logger.error(e)
         except Exception as e:
-            print('resolve.Exception', e)
             logger.error(e)
         finally:
             #if s: s.shutdown(socket.SHUT_RDWR)
@@ -60,10 +60,8 @@ class MyThread(threading.Thread):
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.resolve(s)
         except socket.error as e:
-            print('http.socket.error', e)
             logger.error(e)
         except Exception as e:
-            print('http.Exception', e)
             logger.error(e)
         finally:
             client_addr = None
@@ -82,25 +80,23 @@ class ProxyServer(object):
             self.server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             self.server.bind((host, port))
             self.server.listen(listen)
-            print("listening [*] on {}:{}".format(host, port))
+            logger.info("listening [*] on {}:{}".format(host, port))
         except socket.error as e:
-            print('__init__', e)
             logger.error(e)
             if self.server: self.server.close()
             sys.exit(1)
         except Exception as e:
-            print('__init__', e)
             logger.error(e)
             if self.server: self.server.close()
             sys.exit(1)
 
     def run(self):
-        try:
-            print("starting listening")
-            while True:
+        logger.info("starting listening")
+        while True:
+            conn = None
+            try:
                 conn, client_addr = self.server.accept()
                 conn.setblocking(False)
-                print('receiving connection from ==> ip: {}, port : {}'.format(client_addr[0], client_addr[1]))
                 maxDataRecvInMB = int(self.__configServer['maxDataRecvInMB'])
                 request = conn.recv(maxDataRecvInMB)
                 backend_found = self.__allows_path(request)
@@ -110,11 +106,9 @@ class ProxyServer(object):
                     threadx = MyThread(self.__config, conn, client_addr, request, backend_found)
                     threadx.daemon = False
                     threadx.start()
-        except Exception as e:
-            print('run', e)
-            logger.error(e)
-            if self.server: self.server.close()
-            sys.exit(1)
+            except Exception as e:
+                logger.error(e)
+                if conn: conn.close()
 
     def __allows_path(self, request):
         if not request:

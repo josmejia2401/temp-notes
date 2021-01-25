@@ -2,6 +2,7 @@
   "name": "google-keep-like",
   "version": "0.1.1",
   "private": true,
+  "homepage": "/notes",
   "dependencies": {
     "eslint-plugin-flowtype": "5.2.0",
     "normalize.css": "^8.0.1",
@@ -19,11 +20,10 @@
   "scripts": {
     "start_express": "node server.js",
     "start": "react-scripts start",
-    "build": "react-scripts build",
+    "build": "NODE_ENV=development PUBLIC_URL=http://localhost:8080/notes react-scripts build",
+    "build_prod": "NODE_ENV=production PUBLIC_URL=https://app.su9.co react-scripts build",
     "test": "react-scripts test --env=jsdom",
-    "eject": "react-scripts eject",
-    "build_dev": "NODE_ENV=development PUBLIC_URL=http://localhost:8080/notes react-scripts build",
-    "build_prod": "NODE_ENV=production PUBLIC_URL=https://app.su9.co react-scripts build"
+    "eject": "react-scripts eject"
   },
   "browserslist": {
     "production": [
