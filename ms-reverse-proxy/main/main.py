@@ -31,7 +31,7 @@ class MyThread(threading.Thread):
             timeOutInSec = int(self.__configServer['timeOutInSec'])
             maxDataRecvInMB = int(self.__configServer['maxDataRecvInMB'])
             s.settimeout(timeOutInSec)
-            logger.info("SOCKET establisheding. Peer: {} - {}".format(url_parse.hostname, url_parse.port))
+            logger.info("SOCKET establisheding. Peer: {} - {} - {} - {}".format(url_parse.hostname, url_parse.port, maxDataRecvInMB, timeOutInSec))
             logger.info("REQUEST: {}".format(self.request))
             s.connect((url_parse.hostname, url_parse.port))
             logger.info("SOCKET established. Peer: {}".format(s.getpeername()))
@@ -76,7 +76,7 @@ class ProxyServer(object):
             port = int(self.__configServer['port'])
             listen = int(self.__configServer['listen'])
 
-            self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM, socket.IPPROTO_TCP)
             self.server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
             self.server.bind((host, port))
             self.server.listen(listen)
@@ -96,7 +96,8 @@ class ProxyServer(object):
             conn = None
             try:
                 conn, client_addr = self.server.accept()
-                conn.setblocking(False)
+                logger.info('se recibe el host {} {}'.format(client_addr[0], client_addr[1]))
+                conn.setblocking(True)
                 maxDataRecvInMB = int(self.__configServer['maxDataRecvInMB'])
                 request = conn.recv(maxDataRecvInMB)
                 backend_found = self.__allows_path(request)
@@ -115,7 +116,9 @@ class ProxyServer(object):
             return None
         first_line = str(request).split('\n')[0]
         url = first_line.split(' ')[1]
+        logger.info('obteniendo url {}'.format(url))
         targetHost = self.__config.get_object('targetHost')
+        logger.info('obteniendo targetHost {}'.format(targetHost))
         for target in targetHost:
             if url in target['path']:
                 if len(target['methods']) > 0 and self.command in target['methods']:
