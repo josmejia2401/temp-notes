@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 import sys
-from main.main import ProxyServer
+from main.main2 import ProxyServer
 
 if __name__ == '__main__':
     try:
