@@ -1,6 +1,8 @@
 var BASE_URL = 'http://localhost:9000/ms/temp-notes';
-if (window.location.host.includes("localhost")) {
+if (window.location.host.includes("localhost:8080")) {
   BASE_URL = 'http://localhost:8080/ms/temp-notes';
+} else if (!window.location.host.includes("localhost")) {
+  BASE_URL = '/ms/temp-notes';
 }
 
 const fetchJSON = (url, option) => {

@@ -20,7 +20,7 @@
   "scripts": {
     "start_express": "node server.js",
     "start": "react-scripts start",
-    "build": "NODE_ENV=development PUBLIC_URL=http://localhost:8080/notes react-scripts build",
+    "build": "NODE_ENV=development PUBLIC_URL=/notes react-scripts build",
     "build_prod": "NODE_ENV=production PUBLIC_URL=https://app.su9.co react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
