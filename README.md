@@ -35,8 +35,8 @@ sudo docker system prune --all
 sudo service docker restart
 sudo service docker start
 sudo service docker stop
-
-
+## Docker 
+sudo docker-compose --compatibility -f docker-compose.yml rm --all & sudo docker-compose --compatibility -f docker-compose.yml build --no-cache & sudo docker-compose --compatibility -f docker-compose.yml up --force-recreate
 ## Abrir puerto
 sudo systemctl status ufw 
 sudo ufw enable
@@ -58,3 +58,8 @@ sudo ufw status
 sudo ufw status verbose
 # kill app port
 kill -9 $(lsof -t -i:8080)
+# Exponer puerto a interner
+1. Descargar: https://ngrok.com/download
+2. ./ngrok http 8080
+
+./staqlab-tunnel 8080 hostname=sudo9

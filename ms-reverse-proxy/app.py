@@ -16,16 +16,22 @@ logging.getLogger('requests.packages.urllib3').setLevel(logging.ERROR)
 def proxy(url):
     try:
         targetHost = __allows_path(url, request.method)
+        logger.info('targetHost {} - {}'.format(url, targetHost))
         if not targetHost:
-            abort(403)
-            return
+            #abort(403)
+            return {}, 403
+        logger.info('se construye la peticion {}'.format(url))
         r = make_request(url, targetHost, request.method, dict(request.headers))
+        logger.info('se construye header {}'.format(url))
         headers = dict(r.raw.headers)
+        logger.info('se construye header 2 - {}'.format(headers))
         def generate():
             for chunk in r.raw.stream(decode_content=False):
                 yield chunk
+        logger.info('se construye la salida - {}'.format(headers))
         out = Response(generate(), headers=headers)
         out.status_code = r.status_code
+        logger.info('se construye la out - {}'.format(out))
         return out
     except Exception as e:
         logger.error(e)
@@ -38,6 +44,7 @@ def make_request(url, targetHost, method, headers={}):
     host = request.headers.get('host')
     if host:
         headers.update({ "Host" : "%s" % (targetHost['url'])})
+    logger.info('make_request - {}'.format(headers))
     if method.upper() == 'GET':
         return requests.request(method, url, params=request.args, stream=True, headers=headers, allow_redirects=False)
     if request.json:
@@ -58,6 +65,7 @@ def after_request(response):
     return response
 
 def __allows_path(url, command):
+    logger.info('__allows_path {} command {}'.format(url, command))
     if not url:
         return None
     targetHost = config.get_object('targetHost')
