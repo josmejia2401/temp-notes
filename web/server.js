@@ -23,11 +23,15 @@ app.get('/notes/**', function (req, res) {
     arrayx = arrayx.slice(1);
     arrayx = arrayx.slice(1);
     const index = path.join(__dirname, 'build', arrayx.join('/'));
-    res.sendFile(index);
+    if (fs.existsSync(index)) {
+        res.sendFile(index);
+    } else {
+        const index = path.join(__dirname, 'build', 'index.html');
+        res.sendFile(index);    
+    }
 });
 
 app.get('/', function (req, res) {
-    console.log("/");
     const index = path.join(__dirname, 'build', 'index.html');
     res.sendFile(index);
 });

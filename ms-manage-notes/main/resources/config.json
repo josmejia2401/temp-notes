@@ -9,8 +9,8 @@
 		"debug" : true
 	},
 	"db": {
-		"uri": "mongodb+srv://<user>:<pass>@su9-cluster.zfzcn.mongodb.net/sudo9_dev?retryWrites=true&w=majority",
-		"uri2": "mongodb://<user>:<pass>@su9-cluster-shard-00-00.zfzcn.mongodb.net:27017,su9-cluster-shard-00-01.zfzcn.mongodb.net:27017,su9-cluster-shard-00-02.zfzcn.mongodb.net:27017/sudo9_dev?ssl=true&replicaSet=atlas-113f46-shard-0&authSource=admin&retryWrites=true&w=majority",
+		"uri": "mongodb+srv://sudo9:sudo9@su9-cluster.zfzcn.mongodb.net/sudo9_dev?retryWrites=true&w=majority",
+		"uri2": "mongodb://sudo9:sudo9@su9-cluster-shard-00-00.zfzcn.mongodb.net:27017,su9-cluster-shard-00-01.zfzcn.mongodb.net:27017,su9-cluster-shard-00-02.zfzcn.mongodb.net:27017/sudo9_dev?ssl=true&replicaSet=atlas-113f46-shard-0&authSource=admin&retryWrites=true&w=majority",
 		"name": "sudo9_dev",
 		"maxPoolSize": 7,
 		"minPoolSize" : 0,

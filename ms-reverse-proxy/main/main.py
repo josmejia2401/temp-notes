@@ -5,82 +5,81 @@ import threading
 import socket
 import ssl
 from urllib.parse import urlparse
-from main.util.config import Config
 from main.log.log import logger
+import copy
+import datetime
 
-class MyThread(threading.Thread):
+class RequestDTO:
     def __init__(self, config, conn, client_addr, request, backend_found):
+        self.config = copy.deepcopy(config)
+        self.conn = conn
+        self.client_addr = client_addr
+        self.request = request
+        self.backend_found = backend_found
+
+
+class TaskResolve(threading.Thread):
+    def __init__(self, request: RequestDTO = None):
         threading.Thread.__init__(self)
-        self.__configServer = config.get_object('server')
-        self.conn = conn
-        self.client_addr = client_addr
         self.request = request
-        self.backend_found = backend_found
-
-    def re_init(self, config, conn, client_addr, request, backend_found):
-        self.__configServer = config.get_object('server')
-        self.conn = conn
-        self.client_addr = client_addr
-        self.request = request
-        self.backend_found = backend_found
-
-    def resolve(self, s):
-        try:
-            url_parse = urlparse(self.backend_found['url'])
-            #ParseResult(scheme='http', netloc='www.cwi.nl:80', path='/%7Eguido/Python.html', params='', query='', fragment='')
-            timeOutInSec = int(self.__configServer['timeOutInSec'])
-            maxDataRecvInMB = int(self.__configServer['maxDataRecvInMB'])
-            s.settimeout(timeOutInSec)
-            logger.info("SOCKET establisheding. Peer: {} - {} - {} - {}".format(url_parse.hostname, url_parse.port, maxDataRecvInMB, timeOutInSec))
-            logger.info("REQUEST: {}".format(self.request))
-            s.connect((url_parse.hostname, url_parse.port))
-            logger.info("SOCKET established. Peer: {}".format(s.getpeername()))
-            new_host = bytes('Host: {}:{}'.format(url_parse.hostname, url_parse.port), encoding='utf8')
-            current_host = b'Host: localhost:8080'
-            self.request = self.request.replace(current_host, new_host)
-            logger.info("NEW REQUEST: {}".format(self.request))
-            s.send(self.request)
-            while True:
-                data = s.recv(maxDataRecvInMB)
-                if len(data) > 0:
-                    self.conn.send(data)
-                else:
-                    break
-        except socket.error as e:
-            logger.error(e)
-        except Exception as e:
-            logger.error(e)
-        finally:
-            #if s: s.shutdown(socket.SHUT_RDWR)
-            if s: s.close()
-            if self.conn: self.conn.close()
+        self.timeOutInSec = int(self.request.config.get_object('server')['timeOutInSec'])
+        self.maxDataRecvInByte = int(self.request.config.get_object('server')['maxDataRecvInByte'])
 
     def run(self):
         try:
+            self.request.conn.setblocking(False)
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            self.resolve(s)
+            s.setblocking(False)
+            url_parse = urlparse(self.request.backend_found['url'])
+            s.settimeout(self.timeOutInSec)
+            s.connect((url_parse.hostname, url_parse.port))
+            new_host = bytes('Host: {}:{}'.format(url_parse.hostname, url_parse.port), encoding='utf8')
+            current_host = b'Host: localhost:8080'
+            request = self.request.request.replace(current_host, new_host)
+            s.send(request)
+            it = 0
+            while True:
+                buffer = s.recv(self.maxDataRecvInByte)
+                if len(buffer) > 0:
+                    a = datetime.datetime.now()
+                    self.request.conn.send(buffer)
+                    b = datetime.datetime.now()
+                    logger.info('b-a=> {} con it {} - request {}'.format((b-a), it, self.request.request))
+                else:
+                    break
+                it += 1
         except socket.error as e:
             logger.error(e)
         except Exception as e:
             logger.error(e)
         finally:
             client_addr = None
+            if s: s.close()
+            if self.request.conn: self.request.conn.close()
 
+    #def __delete__(self):
+    #    pass
+
+#class ProxyServer(threading.Thread):
 class ProxyServer(object):
 
-    def __init__(self):
+    def __init__(self, config = None):
+        threading.Thread.__init__(self)
         try:
-            self.__config = Config()
-            self.__configServer = self.__config.get_object('server')
-            host = self.__configServer['host']
-            port = int(self.__configServer['port'])
-            listen = int(self.__configServer['listen'])
-
+            self.config = config
+            self.host = self.config.get_object('server')['host']
+            self.port = int(self.config.get_object('server')['port'])
+            self.listen = int(self.config.get_object('server')['listen'])
+            self.maxDataRecvInByte = int(self.config.get_object('server')['maxDataRecvInByte'])
+            self.running = True
+            #definicion del socket
             self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM, socket.IPPROTO_TCP)
             self.server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-            self.server.bind((host, port))
-            self.server.listen(listen)
-            logger.info("listening [*] on {}:{}".format(host, port))
+            self.server.bind((self.host, self.port))
+            self.server.listen(self.listen)
+            self.server.settimeout(15)
+            self.server.setblocking(False)
+            logger.info("listening [*] on {}:{}".format(self.host, self.port))
         except socket.error as e:
             logger.error(e)
             if self.server: self.server.close()
@@ -89,36 +88,41 @@ class ProxyServer(object):
             logger.error(e)
             if self.server: self.server.close()
             sys.exit(1)
+    
+    def stop(self):
+        self.running = False
 
     def run(self):
         logger.info("starting listening")
-        while True:
+        while self.running == True:
             conn = None
             try:
                 conn, client_addr = self.server.accept()
-                logger.info('se recibe el host {} {}'.format(client_addr[0], client_addr[1]))
-                conn.setblocking(True)
-                maxDataRecvInMB = int(self.__configServer['maxDataRecvInMB'])
-                request = conn.recv(maxDataRecvInMB)
+                print("leyendo")
+                request = conn.recv(self.maxDataRecvInByte)
                 backend_found = self.__allows_path(request)
                 if not backend_found:
                     conn.close()
                 else:
-                    threadx = MyThread(self.__config, conn, client_addr, request, backend_found)
-                    threadx.daemon = False
-                    threadx.start()
-            except Exception as e:
-                logger.error(e)
+                    r = RequestDTO(self.config, conn, client_addr, request, backend_found)
+                    taskResolve = TaskResolve(r)
+                    taskResolve.daemon = False
+                    taskResolve.start()
+            except BlockingIOError as e:
                 if conn: conn.close()
+                continue
+            except Exception as e:
+                logger.error('Exception', str(e))
+                if conn: conn.close()
+                if self.server: self.server.close()
+                sys.exit(1)
 
     def __allows_path(self, request):
         if not request:
             return None
         first_line = str(request).split('\n')[0]
         url = first_line.split(' ')[1]
-        logger.info('obteniendo url {}'.format(url))
-        targetHost = self.__config.get_object('targetHost')
-        logger.info('obteniendo targetHost {}'.format(targetHost))
+        targetHost = self.config.get_object('targetHost')
         for target in targetHost:
             if url in target['path']:
                 if len(target['methods']) > 0 and self.command in target['methods']:

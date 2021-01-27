@@ -7,8 +7,8 @@
 		"host" : "0.0.0.0",
 		"port": 8080,
         "debug" : true,
-        "listen" : 8,
-        "maxDataRecvInMB" : 4096,
+        "listen" : 200,
+        "maxDataRecvInByte" : 8192,
         "timeOutInSec": 10
 
 	},
@@ -16,13 +16,13 @@
     "targetHost" : [
         {
             "id" : "ms-temp-notes-service",
-            "path" : "/ms/temp-notes/",
+            "path" : "ms/temp-notes/",
             "url" : "http://172.17.0.1:9000",
             "methods" : []
         },
         {
             "id" : "web-temp-notes-service",
-            "path" : "/notes",
+            "path" : "notes/",
             "url" : "http://172.17.0.1:9005",
             "methods" : []
         }
