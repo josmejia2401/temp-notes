@@ -1,4 +1,4 @@
-version: '3.4'
+version: "3.9"
 services:
   ms-reverse-proxy:
     container_name: ms-reverse-proxy
@@ -13,15 +13,21 @@ services:
       - fullstack
     volumes:
       - ./logs/:/logs:rw
-    restart: always
-    #deploy:
-    #  resources:
-    #    limits:
-    #      cpus: '0.5'
-    #      memory: 100M
-    #    reservations:
-    #      cpus: '0.1'
-    #      memory: 50M
+    #restart: always
+    stdin_open: true
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 50M
+        reservations:
+          cpus: '0.25'
+          memory: 20M
     depends_on:
       - "ms-manage-notes"
       - "web"
@@ -38,7 +44,21 @@ services:
       - fullstack
     volumes:
       - ./logs/:/logs:rw
-    restart: always
+    #restart: always
+    stdin_open: true
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 50M
+        reservations:
+          cpus: '0.25'
+          memory: 20M
   web:
     container_name: web
     build:
@@ -55,8 +75,21 @@ services:
       - ./web:/web
       - ./web/node_modules
       - ./build:/build
-    restart: always
+    #restart: always
     stdin_open: true
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 50M
+        reservations:
+          cpus: '0.25'
+          memory: 20M
   ms-timer-task:
     container_name: ms-timer-task
     build:
@@ -70,7 +103,21 @@ services:
       - fullstack
     volumes:
       - ./logs/:/logs:rw
-    restart: always
+    #restart: always
+    stdin_open: true
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 50M
+        reservations:
+          cpus: '0.25'
+          memory: 20M
 networks:
   fullstack:
     driver: bridge
