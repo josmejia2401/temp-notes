@@ -98,7 +98,6 @@ class ProxyServer(object):
             conn = None
             try:
                 conn, client_addr = self.server.accept()
-                print("leyendo")
                 request = conn.recv(self.maxDataRecvInByte)
                 backend_found = self.__allows_path(request)
                 if not backend_found:

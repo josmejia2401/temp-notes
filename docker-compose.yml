@@ -13,7 +13,7 @@ services:
       - fullstack
     volumes:
       - ./logs/:/logs:rw
-    #restart: always
+    restart: always
     stdin_open: true
     deploy:
       restart_policy:
@@ -30,7 +30,7 @@ services:
           memory: 20M
     depends_on:
       - "ms-manage-notes"
-      - "web"
+      - "mc-web"
   ms-manage-notes:
     container_name: ms-manage-notes
     build:
@@ -44,7 +44,7 @@ services:
       - fullstack
     volumes:
       - ./logs/:/logs:rw
-    #restart: always
+    restart: always
     stdin_open: true
     deploy:
       restart_policy:
@@ -59,10 +59,10 @@ services:
         reservations:
           cpus: '0.25'
           memory: 20M
-  web:
-    container_name: web
+  mc-web:
+    container_name: mc-web
     build:
-      context: web
+      context: mc-web
       dockerfile: Dockerfile
     environment:
       - ENVIRONMENT=production
@@ -72,10 +72,7 @@ services:
       - fullstack
     volumes:
       - ./logs/:/logs:rw
-      - ./web:/web
-      - ./web/node_modules
-      - ./build:/build
-    #restart: always
+    restart: always
     stdin_open: true
     deploy:
       restart_policy:
@@ -90,6 +87,37 @@ services:
         reservations:
           cpus: '0.25'
           memory: 20M
+  #web:
+  #  container_name: web
+  #  build:
+  #    context: web
+  #    dockerfile: Dockerfile
+  #  environment:
+  #    - ENVIRONMENT=production
+  #  ports:
+  #    - "9005:9005"
+  #  networks:
+  #    - fullstack
+  #  volumes:
+  #    - ./logs/:/logs:rw
+  #    - ./web:/web
+  #    - ./web/node_modules
+  #    - ./build:/build
+  #  restart: always
+  #  stdin_open: true
+  #  deploy:
+  #    restart_policy:
+  #      condition: on-failure
+  #      delay: 5s
+  #      max_attempts: 3
+  #      window: 120s
+  #    resources:
+  #      limits:
+  #        cpus: '0.50'
+  #        memory: 50M
+  #      reservations:
+  #        cpus: '0.25'
+  #        memory: 20M
   ms-timer-task:
     container_name: ms-timer-task
     build:

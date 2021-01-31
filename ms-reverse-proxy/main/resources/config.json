@@ -18,13 +18,15 @@
             "id" : "ms-temp-notes-service",
             "path" : "ms/temp-notes/",
             "url" : "http://172.17.0.1:9000",
-            "methods" : []
+            "methods" : [],
+            "ignorePath": false
         },
         {
             "id" : "web-temp-notes-service",
             "path" : "notes/",
             "url" : "http://172.17.0.1:9005",
-            "methods" : []
+            "methods" : [],
+            "ignorePath": false
         }
     ]
 }

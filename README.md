@@ -63,3 +63,16 @@ kill -9 $(lsof -t -i:8080)
 2. ./ngrok http 8080
 
 ./staqlab-tunnel 8080 hostname=sudo9
+
+
+Buenos días,
+
+Solicito amablemente configurar mi ruoter o modem para que exponga los puertos 8080, 9100, 9101, 9102, 9200, 9201, 9203, 9090 y 9091 a internet, esto con el fin de exponer mis aplicaciones web a la nube.
+
+Los puertos 9090 y 9091 deben permitir el acceso desde el exterior (internet o nube) y redirigirlos a la IPv4 local 192.168.0.5 con los puertos descritos anteriormente (9090 y 9091)
+
+Los puertos 8080 y 9100, 9101, 9102 deben permitir el acceso desde el exterior (internet o nube) y redirigirlos a la IPv4 local 192.168.0.6 con los puertos descritos anteriormente (8080, 9100, 9101, 9102)
+
+Los puertos 9200, 9201, 9203 deben permitir el acceso desde el exterior (internet o nube) y redirigirlos a la IPv4 local 192.168.0.7 con los puertos descritos anteriormente (9200, 9201, 9203)
+
+Muchas gracias,

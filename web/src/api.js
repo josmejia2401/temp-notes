@@ -21,11 +21,15 @@ const fetchJSON = (url, option) => {
 }
 
 export const getNotes = (username) => {
-  return fetchJSON(`/${username}/get-all`);
+  return fetchJSON(`/${username}/get-all`, {
+    method: 'GET'
+  });
 }
 
 export const getNote = (username, noteId) => {
-  return fetchJSON(`/${username}/${noteId}/get`);
+  return fetchJSON(`/${username}/${noteId}/get`, {
+    method: 'GET'
+  });
 }
 
 export const addNote = (username, note) => {
@@ -44,27 +48,6 @@ export const updateNote = (username, note) => {
 
 export const deleteNote = (username, note) => {
   return fetchJSON(`/${username}/${note.id}/delete`, {
-    method: 'DELETE',
-  });
-}
-
-export const login = (email, password) => {
-  return fetchJSON('/auth', {
-    method: 'POST',
-    body: JSON.stringify({
-      email,
-      password,
-    })
-  });
-}
-
-export const register = (username, password, email) => {
-  return fetchJSON('/users', {
-    method: 'POST',
-    body: JSON.stringify({
-      username,
-      password,
-      email,
-    })
+    method: 'DELETE'
   });
 }
