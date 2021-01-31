@@ -48,11 +48,14 @@ def make_request(url, targetHost, method, headers={}):
         url = __normalize_url(targetHost['url'], url)
     else:
         url = __normalize_url(targetHost['url'], url)
-    
-    print('se ha definido false=>', url)
+        
+    logger.info('se ha definido false=>', url)
     host = request.headers.get('host')
     if host:
         headers.update({ "Host" : "%s" % (targetHost['url'])})
+    
+    if method.upper() == 'GET' or method.upper() == 'DELETE':
+        return requests.request(method, url, params=request.args, stream=True, headers=headers, allow_redirects=False)
     if request.is_json and request.json and len(request.json) > 0: 
         return requests.request(method, url, params=request.args, stream=True, headers=headers, allow_redirects=False, json=request.json)
     elif request.form and len(request.form) > 0:

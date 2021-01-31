@@ -13,10 +13,14 @@ const fetchJSON = (url, option) => {
     } 
   }).then(response => {
     if(response && !response.ok) {
-      //return new Error('error');
       throw Error(response.statusText);
     }
-    return response.json();
+    const contentType = response.headers.get("content-type");
+    if (contentType && contentType.indexOf("application/json") !== -1) {
+      return response.json();
+    } else {
+      return response.text();
+    }
   });
 }
 
