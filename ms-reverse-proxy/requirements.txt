@@ -1,4 +1,4 @@
 dnspython==2.1.0
-# Consumo a REST APIs externas
+# Consumo a REST APIs externas - app_request
 requests==2.25.1
 Flask==1.1.2

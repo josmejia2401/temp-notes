@@ -9,7 +9,7 @@
         "debug" : true,
         "listen" : 200,
         "maxDataRecvInByte" : 8192,
-        "timeOutInSec": 10
+        "timeOutInSec": 15
 
 	},
     "db": { },

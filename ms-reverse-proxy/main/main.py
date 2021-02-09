@@ -22,34 +22,33 @@ class TaskResolve(threading.Thread):
     def __init__(self, request: RequestDTO = None):
         threading.Thread.__init__(self)
         self.request = request
-        self.timeOutInSec = int(self.request.config.get_object('server')['timeOutInSec'])
+        self.timeOutInSec = float(self.request.config.get_object('server')['timeOutInSec'])
         self.maxDataRecvInByte = int(self.request.config.get_object('server')['maxDataRecvInByte'])
 
     def run(self):
+        s = None
         try:
             self.request.conn.setblocking(False)
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             s.setblocking(False)
-            url_parse = urlparse(self.request.backend_found['url'])
             s.settimeout(self.timeOutInSec)
+            url_parse = urlparse(self.request.backend_found['url'])
             s.connect((url_parse.hostname, url_parse.port))
             new_host = bytes('Host: {}:{}'.format(url_parse.hostname, url_parse.port), encoding='utf8')
             current_host = b'Host: localhost:8080'
             request = self.request.request.replace(current_host, new_host)
-            s.send(request)
-            it = 0
+            s.sendall(request)
+            it_response = b''
             while True:
                 buffer = s.recv(self.maxDataRecvInByte)
-                if len(buffer) > 0:
-                    a = datetime.datetime.now()
-                    self.request.conn.send(buffer)
-                    b = datetime.datetime.now()
-                    logger.info('b-a=> {} con it {} - request {}'.format((b-a), it, self.request.request))
+                if buffer and len(buffer) > 0:
+                    it_response += buffer
                 else:
                     break
-                it += 1
+            if it_response and len(it_response) > 0:
+                self.request.conn.sendall(it_response)
         except socket.error as e:
-            logger.error(e)
+            logger.error(self.request.backend_found['url'], e)
         except Exception as e:
             logger.error(e)
         finally:
@@ -64,21 +63,24 @@ class TaskResolve(threading.Thread):
 class ProxyServer(object):
 
     def __init__(self, config = None):
-        threading.Thread.__init__(self)
+        #threading.Thread.__init__(self)
         try:
             self.config = config
             self.host = self.config.get_object('server')['host']
             self.port = int(self.config.get_object('server')['port'])
             self.listen = int(self.config.get_object('server')['listen'])
             self.maxDataRecvInByte = int(self.config.get_object('server')['maxDataRecvInByte'])
+            self.timeOutInSec = float(self.config.get_object('server')['timeOutInSec'])
             self.running = True
             #definicion del socket
-            self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM, socket.IPPROTO_TCP)
+            self.server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            self.server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
+            self.server.setsockopt(socket.IPPROTO_TCP , socket.TCP_NODELAY, 1)
             self.server.bind((self.host, self.port))
             self.server.listen(self.listen)
-            self.server.settimeout(15)
-            self.server.setblocking(False)
+            self.server.settimeout(self.timeOutInSec)
+            #self.server.setblocking(False)
             logger.info("listening [*] on {}:{}".format(self.host, self.port))
         except socket.error as e:
             logger.error(e)
@@ -91,6 +93,8 @@ class ProxyServer(object):
     
     def stop(self):
         self.running = False
+        if self.server: self.server.close()
+        sys.exit(1)
 
     def run(self):
         logger.info("starting listening")
@@ -110,11 +114,12 @@ class ProxyServer(object):
             except BlockingIOError as e:
                 if conn: conn.close()
                 continue
+            except socket.timeout as e:
+                if conn: conn.close()
+                continue
             except Exception as e:
                 logger.error('Exception', str(e))
                 if conn: conn.close()
-                if self.server: self.server.close()
-                sys.exit(1)
 
     def __allows_path(self, request):
         if not request:
