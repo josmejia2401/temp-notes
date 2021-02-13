@@ -25,3 +25,10 @@ class NoteService(object):
         where_payload = { "username": username, "_id": ObjectId(noteId)}
         response = self.__collection.delete_one(where_payload)
         return response.deleted_count
+    
+    def delete_many(self, days: int = 5) -> int:
+        d = datetime.now() - timedelta(days=days)
+        date_string = d.isoformat()
+        where_payload = { "updateAt": { "$lt": date_string } }
+        response = self.__collection.delete_many(where_payload)
+        return response.deleted_count

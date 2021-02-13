@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
 import NoteList from './components/NoteList';
-import ComposerMain from './components/ComposerMain';
+import InputNote from './components/InputNote';
 import NoteDetail from './components/NodeDetail';
+import Access from './components/Access'
+import Title from './components/Title'
 import * as api from './api';
 
 import './App.css';
@@ -25,6 +27,7 @@ class App extends Component {
     this.state = {
       notes: [],
       loading: true,
+      isAccessUsername: false
     };
   }
 
@@ -105,6 +108,22 @@ class App extends Component {
     });
   };
 
+  handleIsAccessUsername = (isAccessUsername) => {
+    this.setState({isAccessUsername: isAccessUsername});
+  }
+
+  renderNotes = () => {
+    const { notes } = this.state;
+    return (
+      <div>
+        <Title/>
+        <InputNote onSubmit={this.handleAddNote} history={this.props.history} />
+        <NoteList notes={notes} onUpdate={this.handleUpdateNote} onDelete={this.handleDeleteNote} history={this.props.history} />
+        <NoteDetail onUpdate={this.handleUpdateNote} onDelete={this.handleDeleteNote} notes={notes} location={this.props.location} history={this.props.history} />
+      </div>
+    );
+  }
+
   render() {
     const { notes, loading } = this.state;
     if (loading) {
@@ -112,9 +131,8 @@ class App extends Component {
     } else {
       return (
         <div className="App">
-          <ComposerMain onSubmit={this.handleAddNote} history={this.props.history} />
-          <NoteList notes={notes} onUpdate={this.handleUpdateNote} onDelete={this.handleDeleteNote} history={this.props.history} />
-          <NoteDetail onUpdate={this.handleUpdateNote} onDelete={this.handleDeleteNote} notes={notes} location={this.props.location} history={this.props.history} />
+          { !this.state.isAccessUsername && <Access handleIsAccessUsername={this.handleIsAccessUsername} location={this.props.location} history={this.props.history}></Access>}
+          { this.state.isAccessUsername && <this.renderNotes/> }
         </div>
       );
     }

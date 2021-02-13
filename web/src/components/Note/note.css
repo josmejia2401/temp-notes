@@ -17,3 +17,9 @@
   word-break: break-all;
   text-align: justify;
 }
+
+.note-updateAt {
+  font-size: 10px;
+  text-align: right;
+  margin-top: 20px;
+}

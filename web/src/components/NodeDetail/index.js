@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Route } from 'react-router-dom';
 import './node-detail.css';
-import Composer from '../Composer';
+import ViewNote from '../ViewNote';
 
 class NoteDetail extends Component {
   constructor() {
@@ -52,7 +52,7 @@ class NoteDetail extends Component {
       <div className={`box-fill modal ${modalClass}`} ref={node => (this._modal = node)}>
         <div className="box-fill modal-backdrop" ref={node => (this._modalBackdrop = node)}/>
         <div className="modal-content center-item" ref={node => (this._modalContent = node)}>
-          <Composer note={note} isEdit onSubmit={this._onUpdateItem} onDelete={this._onDeleteItem} history={this.props.history} />
+          <ViewNote note={note} isEdit onSubmit={this._onUpdateItem} onDelete={this._onDeleteItem} history={this.props.history} />
         </div>
       </div>
     );

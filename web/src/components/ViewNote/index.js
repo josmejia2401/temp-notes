@@ -24,9 +24,12 @@ const noteToState = note => {
   };
 }
 
-class ComposerMain extends Component {
+class ViewNote extends Component {
+
   constructor(props) {
     super(props);
+    this.handleResize = this.handleResize.bind(this);
+    this.textAreaRef = React.createRef();//React.useRef();//React.createRef();
     let state = initialState;
     if (props.note) {
       state = noteToState(props.note);
@@ -35,8 +38,22 @@ class ComposerMain extends Component {
     }
     window.activeNote = {};
     this.state = state;
-    this.handleChange = this.handleChange.bind(this);
-  }
+  };
+
+  componentDidMount() {
+    this.onResize();
+  };
+
+  onResize = () => {
+    if (this.textAreaRef && this.textAreaRef.current) {
+      const textAreaComposerEdit = document.getElementById("textAreaComposerEdit");
+      if (textAreaComposerEdit) {
+        textAreaComposerEdit.style.height = 'auto';
+        textAreaComposerEdit.style.height = textAreaComposerEdit.scrollHeight + 'px';
+      }
+    }
+  };
+
 
   handleChange = event => {
     const fieldName = event.target.name;
@@ -66,16 +83,10 @@ class ComposerMain extends Component {
     this.setState(initialState);
   };
 
-  getValue = fieldName => {
-    let val = this.state[fieldName].value;
-    val = val.replace(/<\s*\/?br\s*[\/]?>/g, '\n');
-    return val;
-  };
-
   handleDelete = event => {
     event.preventDefault();
     this.props.onDelete && this.props.onDelete(this.props.note);
-  }
+  };
 
   handleResize = e => {
     if (e && e.target) {
@@ -83,12 +94,25 @@ class ComposerMain extends Component {
       element.style.height = 'auto';
       element.style.height = element.scrollHeight + 'px';
     }
-  }
+  };
+
+  handleCancel = e => {
+    if (e && e.target) {
+      e.preventDefault();
+      this.props.history.goBack();
+    }
+  };
+
+  getValue = fieldName => {
+    let val = this.state[fieldName].value;
+    val = val.replace(/<\s*\/?br\s*[\/]?>/g, '\n');
+    return val;
+  };
 
   render() {
     const { isEdit } = this.props;
     return (
-      <div className={`card-main composer-container ${isEdit ? 'edit' : ''}`}>
+      <div className={`card composer-container ${isEdit ? 'edit' : ''}`}>
         <form onSubmit={this.handleSubmit} className="input-form">
           <Input
             type="text"
@@ -98,24 +122,29 @@ class ComposerMain extends Component {
             autoFocus
             value={this.getValue('title')}
             onChange={this.handleChange}
+            style={{ 'marginBottom': '5px' }}
           />
-          <Textarea 
+          <Textarea
+            id="textAreaComposerEdit"
+            autoFocus
+            ref={this.textAreaRef}
             className="note-description"
             name="description"
             placeholder="Take a note..."
             value={this.getValue('description')}
             onChange={this.handleChange}
             onInput={this.handleResize}
-            style={{marginTop: '10px'}}
+            style={{ 'marginTop': '5px' }}
           />
           <div className="actions">
+            <Button>Actualizar</Button>
             {isEdit && <Button onClick={this.handleDelete}>Delete</Button>}
-            <Button>Done</Button> 
+            <Button onClick={this.handleCancel}>Cancel</Button>
           </div>
         </form>
       </div>
     );
-  }
+  };
 }
 
-export default ComposerMain;
+export default ViewNote;

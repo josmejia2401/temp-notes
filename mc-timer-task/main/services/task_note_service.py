@@ -12,12 +12,9 @@ class TaskNoteService(Task):
 
     def run_task(self):
         try:
+            logger.info('Iniciando la tarea programada')
             timer_config = self.__config.get_object('timer')
-            result = self.__note_services.get_all(days=int(timer_config['days_of_grace']))
-            print('run_task', result)
-            self.__delete_note()
+            result = self.__note_services.delete_many(days=int(timer_config['days_of_grace']))
+            logger.info('Eliminando notas. Cantidad {}'.format(result))
         except Exception as e:
             logger.error('run_task', e)
-    
-    def __delete_note(self):
-        pass
